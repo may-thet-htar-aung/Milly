@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Currency {
+  USD
+  MMK
+}
+
+enum ListingCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  POOR
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  SOLD
+  RESERVED
+  ARCHIVED
+}
+
+enum ReportReason {
+  SPAM
+  FRAUD
+  PROHIBITED_ITEM
+  INACCURATE_INFORMATION
+  HARASSMENT
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+model User {
+  id             String           @id @default(cuid())
+  name           String
+  email          String           @unique
+  passwordHash   String
+  avatarUrl      String?
+  phone          String?
+  bio            String?
+  location       String?
+  role           Role             @default(USER)
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  listings       Listing[]
+  favorites      Favorite[]
+  reportsFiled   Report[]         @relation("Reporter")
+  reportsAgainst Report[]         @relation("ReportedUser")
+  sessions       RefreshSession[]
+}
+
+model RefreshSession {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  parentId  String?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Category[] @relation("CategoryTree")
+  listings  Listing[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([parentId])
+}
+
+model Listing {
+  id          String          @id @default(cuid())
+  sellerId    String
+  categoryId  String
+  title       String
+  description String
+  priceMinor  Int
+  currency    Currency
+  condition   ListingCondition
+  status      ListingStatus   @default(DRAFT)
+  location    String
+  latitude    Float?
+  longitude   Float?
+  viewCount   Int             @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  seller      User            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  category    Category        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images      ListingImage[]
+  favorites   Favorite[]
+  reports     Report[]
+
+  @@index([sellerId])
+  @@index([categoryId])
+  @@index([status, createdAt])
+  @@index([currency, priceMinor])
+}
+
+model ListingImage {
+  id        String  @id @default(cuid())
+  listingId String
+  url       String
+  sortOrder Int     @default(0)
+  altText   String?
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, sortOrder])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId, createdAt])
+}
+
+model Report {
+  id             String       @id @default(cuid())
+  reporterId     String
+  listingId      String?
+  reportedUserId String?
+  reason         ReportReason
+  details        String?
+  status         ReportStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  reporter       User         @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  listing        Listing?     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reportedUser   User?        @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([listingId])
+  @@index([reportedUserId])
+}

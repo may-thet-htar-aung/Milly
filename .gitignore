@@ -1,0 +1,10 @@
+.pnpm-store/
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.log
+.git-standalone-backup/
