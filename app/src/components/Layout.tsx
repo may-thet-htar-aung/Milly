@@ -11,7 +11,7 @@ export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const close = () => setOpen(false);
-  const goToSell = () => { setSellNavigating(true); navigate(user ? "/sell" : "/login"); };
+  const goToSell = () => { setSellNavigating(true); navigate(user ? "/sell" : `/login?next=${encodeURIComponent("/sell")}`); };
 
   useEffect(() => {
     if (location.pathname !== "/sell") setSellNavigating(false);

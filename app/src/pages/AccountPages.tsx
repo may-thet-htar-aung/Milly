@@ -1,12 +1,15 @@
-import { ArrowRight, CheckCircle2, Heart, LogOut, Package, UserRound } from "lucide-react";
+import { Archive, ArrowRight, CheckCircle2, Heart, LogOut, Package, UserRound } from "lucide-react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Card } from "../components/ui";
 import { PageContainer } from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import { ListingGrid } from "../components/ListingCard";
 import { Spinner, ErrorState } from "../components/ui";
+import type { Listing, ListingStatus } from "../types";
+import { formatListingStatus } from "../lib/utils";
 
 export function AccountPage() {
   const { user, logout } = useAuth(); const navigate = useNavigate();
@@ -20,6 +23,39 @@ export function FavoritesPage() {
 }
 
 export function MyListingsPage() {
-  const { user } = useAuth(); const listings = useQuery({ queryKey: ["my-listings"], queryFn: api.myListings, enabled: Boolean(user) });
-  return <PageContainer className="account-page"><div className="page-heading"><div><span className="section-kicker">Your seller space</span><h1>Things you’re passing on.</h1><p>Keep details fresh and let people know what is still available.</p></div><Link to="/sell"><Button><Package size={16} />List something</Button></Link></div>{listings.isLoading ? <div className="full-state"><Spinner /></div> : listings.isError ? <ErrorState /> : listings.data?.data.length ? <ListingGrid listings={listings.data.data} /> : <div className="empty-state"><div className="empty-icon"><Package /></div><h2>No listings yet</h2><p>When you are ready, make some space and give an item a second life.</p><Link to="/sell"><Button>Create a listing</Button></Link></div>}</PageContainer>;
+  const { user } = useAuth(); const queryClient = useQueryClient(); const listings = useQuery({ queryKey: ["my-listings"], queryFn: api.myListings, enabled: Boolean(user) });
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const action = useMutation({
+    mutationFn: async ({ id, type }: { id: string; type: ListingAction }) => {
+      if (type === "publish") return api.publishListing(id);
+      if (type === "reserve") return api.reserveListing(id);
+      if (type === "sold") return api.markListingSold(id);
+      return api.archiveListing(id);
+    },
+    onSuccess: (_result, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ["my-listings"] });
+      void queryClient.invalidateQueries({ queryKey: ["listing", variables.id] });
+      setFeedback({ type: "success", message: `${actionSuccessLabel(variables.type)} successfully.` });
+    },
+    onError: (caught) => setFeedback({ type: "error", message: caught instanceof Error ? caught.message : "Unable to update this listing." }),
+  });
+  const confirmAction = (listing: Listing, type: ListingAction) => {
+    if (!window.confirm(actionConfirmation(listing, type))) return;
+    setFeedback(null);
+    action.mutate({ id: listing.id, type });
+  };
+  const renderActions = (listing: Listing) => <div className="seller-listing-actions"><Link to={`/listings/${listing.id}/edit`}><Button variant="outline" size="sm">Edit</Button></Link>{listing.status === "DRAFT" && <Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Publish</Button>}{listing.status === "ACTIVE" && <><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "reserve")} disabled={action.isPending}>Reserve</Button><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "sold")} disabled={action.isPending}>Mark as Sold</Button></>}{listing.status === "RESERVED" && <><Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Make Active</Button><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "sold")} disabled={action.isPending}>Mark as Sold</Button></>}{(listing.status === "DRAFT" || listing.status === "ACTIVE" || listing.status === "RESERVED") && <Button variant="danger" size="sm" onClick={() => confirmAction(listing, "archive")} disabled={action.isPending}><Archive size={14} />Archive</Button>}{(listing.status === "SOLD" || listing.status === "ARCHIVED") && <Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Publish Again</Button>}</div>;
+  return <PageContainer className="account-page"><div className="page-heading"><div><span className="section-kicker">Your seller space</span><h1>Manage Your Listings.</h1><p>Review each listing and keep details fresh as its status changes.</p></div></div>{feedback && <div className={feedback.type === "success" ? "form-success" : "form-error"} role="status">{feedback.message}</div>}{listings.isLoading ? <div className="full-state"><Spinner /></div> : listings.isError ? <ErrorState message={listings.error instanceof Error ? listings.error.message : undefined} /> : listings.data?.data.length ? <ListingGrid listings={listings.data.data} showStatus renderActions={renderActions} /> : <div className="empty-state"><div className="empty-icon"><Package /></div><h2>No listings yet</h2><p>When you are ready, make some space and give an item a second life.</p><Link to="/sell"><Button>Sell An Item</Button></Link></div>}</PageContainer>;
+}
+
+type ListingAction = "publish" | "reserve" | "sold" | "archive";
+
+function actionSuccessLabel(type: ListingAction) {
+  return type === "publish" ? "Listing published" : type === "reserve" ? "Listing reserved" : type === "sold" ? "Listing marked as sold" : "Listing archived";
+}
+
+function actionConfirmation(listing: Listing, type: ListingAction) {
+  const nextStatus: Record<ListingAction, ListingStatus> = { publish: "ACTIVE", reserve: "RESERVED", sold: "SOLD", archive: "ARCHIVED" };
+  const status = formatListingStatus(nextStatus[type]);
+  return type === "archive" ? `Archive “${listing.title}”? It will be removed from public browsing.` : `Change “${listing.title}” to ${status}?`;
 }
