@@ -22,8 +22,27 @@ export function FavoritesPage() {
   return <PageContainer className="account-page"><div className="page-heading"><div><span className="section-kicker">Your shelf</span><h1>Saved for later.</h1><p>The things that made you pause for a second look.</p></div></div>{favorites.isLoading ? <div className="full-state"><Spinner /></div> : favorites.isError ? <ErrorState /> : favorites.data?.data.length ? <ListingGrid listings={favorites.data.data} /> : <div className="empty-state"><div className="empty-icon"><Heart /></div><h2>Your shelf is still empty</h2><p>Tap the heart on a listing when something feels like a maybe.</p><Link to="/listings" className="text-link">Start browsing <ArrowRight size={15} /></Link></div>}</PageContainer>;
 }
 
+const listingCategories = [
+  { id: "all", label: "All Listings" },
+  { id: "published", label: "Published" },
+  { id: "drafts", label: "Drafts" },
+  { id: "pending", label: "Pending Review" },
+  { id: "sold", label: "Sold" },
+] as const;
+
+type ListingCategory = (typeof listingCategories)[number]["id"];
+
+const matchesCategory = (status: ListingStatus, category: ListingCategory) => {
+  if (category === "all") return true;
+  if (category === "published") return status === "ACTIVE";
+  if (category === "drafts") return status === "DRAFT";
+  if (category === "pending") return status === "RESERVED";
+  return status === "SOLD";
+};
+
 export function MyListingsPage() {
   const { user } = useAuth(); const queryClient = useQueryClient(); const listings = useQuery({ queryKey: ["my-listings"], queryFn: api.myListings, enabled: Boolean(user) });
+  const [category, setCategory] = useState<ListingCategory>("all");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const action = useMutation({
     mutationFn: async ({ id, type }: { id: string; type: ListingAction }) => {
@@ -45,7 +64,10 @@ export function MyListingsPage() {
     action.mutate({ id: listing.id, type });
   };
   const renderActions = (listing: Listing) => <div className="seller-listing-actions"><Link to={`/listings/${listing.id}/edit`}><Button variant="outline" size="sm">Edit</Button></Link>{listing.status === "DRAFT" && <Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Publish</Button>}{listing.status === "ACTIVE" && <><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "reserve")} disabled={action.isPending}>Reserve</Button><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "sold")} disabled={action.isPending}>Mark as Sold</Button></>}{listing.status === "RESERVED" && <><Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Make Active</Button><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "sold")} disabled={action.isPending}>Mark as Sold</Button></>}{(listing.status === "DRAFT" || listing.status === "ACTIVE" || listing.status === "RESERVED") && <Button variant="danger" size="sm" onClick={() => confirmAction(listing, "archive")} disabled={action.isPending}><Archive size={14} />Archive</Button>}{(listing.status === "SOLD" || listing.status === "ARCHIVED") && <Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Publish Again</Button>}</div>;
-  return <PageContainer className="account-page"><div className="page-heading"><div><span className="section-kicker">Your seller space</span><h1>Manage Your Listings.</h1><p>Review each listing and keep details fresh as its status changes.</p></div></div>{feedback && <div className={feedback.type === "success" ? "form-success" : "form-error"} role="status">{feedback.message}</div>}{listings.isLoading ? <div className="full-state"><Spinner /></div> : listings.isError ? <ErrorState message={listings.error instanceof Error ? listings.error.message : undefined} /> : listings.data?.data.length ? <ListingGrid listings={listings.data.data} showStatus renderActions={renderActions} /> : <div className="empty-state"><div className="empty-icon"><Package /></div><h2>No listings yet</h2><p>When you are ready, make some space and give an item a second life.</p><Link to="/sell"><Button>Sell An Item</Button></Link></div>}</PageContainer>;
+  const allListings = listings.data?.data ?? [];
+  const visibleListings = allListings.filter((listing) => matchesCategory(listing.status, category));
+  const selectedLabel = listingCategories.find((item) => item.id === category)?.label ?? "All Listings";
+  return <PageContainer className="account-page"><div className="page-heading"><div><span className="section-kicker">Your seller space</span><h1>Manage Your Product Listings</h1><p>Review each listing and keep details fresh as its status changes.</p></div></div>{feedback && <div className={feedback.type === "success" ? "form-success" : "form-error"} role="status">{feedback.message}</div>}{listings.isLoading ? <div className="full-state"><Spinner /></div> : listings.isError ? <ErrorState message={listings.error instanceof Error ? listings.error.message : undefined} /> : allListings.length ? <><div className="seller-filters" role="tablist" aria-label="Listing categories">{listingCategories.map((item) => <button key={item.id} type="button" role="tab" aria-selected={category === item.id} className={category === item.id ? "seller-filter active" : "seller-filter"} onClick={() => setCategory(item.id)}>{item.label}<span>{allListings.filter((listing) => matchesCategory(listing.status, item.id)).length}</span></button>)}</div>{visibleListings.length ? <ListingGrid listings={visibleListings} showStatus renderActions={renderActions} /> : <div className="empty-state"><div className="empty-icon"><Package /></div><h2>No {selectedLabel.toLowerCase()}</h2><p>Listings in this category will show up here.</p></div>}</> : <div className="empty-state"><div className="empty-icon"><Package /></div><h2>No listings yet</h2><p>When you are ready, make some space and give an item a second life.</p><Link to="/sell"><Button>Sell An Item</Button></Link></div>}</PageContainer>;
 }
 
 type ListingAction = "publish" | "reserve" | "sold" | "archive";
