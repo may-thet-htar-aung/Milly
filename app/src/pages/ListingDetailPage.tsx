@@ -1,4 +1,4 @@
-import { ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Clock, Eye, MapPin, ScrollText, Share2, ShieldAlert, SquarePen, UserRound } from "lucide-react";
+import { ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Eye, MapPin, RotateCcwClock, ScrollText, Share2, ShieldAlert, SquarePen, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -65,8 +65,8 @@ export function ListingDetailPage() {
           <h1>{item.title}</h1>
           <div className="detail-price">{formatPrice(item.priceMinor, item.currency)}</div>
           <p className="detail-description">{item.description}</p>
-          <div className="detail-facts"><span><MapPin size={16} />{item.location}</span><span><Clock size={16} />Listed {formatDate(item.createdAt)}</span><span><Eye size={16} />{item.viewCount} views</span></div>
-          <div className="detail-actions"><Button size="lg" onClick={() => navigate("/my-listings")}><ScrollText size={18} />View My Item</Button>{user && (user.id === item.sellerId || user.role === "ADMIN") && <Link to={`/listings/${item.id}/edit`}><Button variant="secondary" size="lg"><SquarePen size={18} />Edit my items</Button></Link>}<Button variant="ghost" size="lg" className="share-button" onClick={() => { void shareListing(); }} aria-label="Share this item" title="Share this item"><Share2 size={20} />{shareFeedback && <span className="share-feedback">{shareFeedback}</span>}</Button></div>
+          <div className="detail-facts"><span><MapPin size={16} />{item.location}</span><span><RotateCcwClock size={16} />Listed {formatDate(item.createdAt)}</span><span><Eye size={16} />{item.viewCount} views</span></div>
+          <div className="detail-actions"><Link to="/my-listings"><Button size="lg"><ScrollText size={18} />View My Items</Button></Link>{user && (user.id === item.sellerId || user.role === "ADMIN") && <Link to={`/listings/${item.id}/edit`}><Button variant="secondary" size="lg"><SquarePen size={18} />Edit my items</Button></Link>}<Button variant="ghost" size="lg" className="share-button" onClick={() => { void shareListing(); }} aria-label="Share this item" title="Share this item"><Share2 size={20} />{shareFeedback && <span className="share-feedback">{shareFeedback}</span>}</Button></div>
           <Card className="seller-card"><div className="seller-avatar">{item.seller.avatarUrl ? <img src={item.seller.avatarUrl} alt="" /> : <UserRound size={22} />}</div><div className="seller-info"><span className="section-kicker">Seller</span><Link to={`/profile/${item.seller.id}`}><strong>{item.seller.name}</strong></Link><span>{item.seller.location ?? "Milly member"}</span></div><span className="seller-status" role="status" title="Seller account on Milly"><BadgeCheck size={15} aria-hidden="true" />Milly Seller</span></Card>
           <div className="safety-note"><ShieldAlert className="safety-note-icon" size={16} aria-hidden="true" /><span>Meet in a public place and inspect the item before making arrangements.</span></div>
         </div>

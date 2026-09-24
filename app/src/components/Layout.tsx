@@ -11,6 +11,8 @@ export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const close = () => setOpen(false);
+  const showCreateAccount = !user && location.pathname === "/";
+  const hideSell = !user && location.pathname === "/register" && new URLSearchParams(location.search).get("next") === "/favorites";
   const goToSell = () => { setSellNavigating(true); navigate(user ? "/sell" : `/login?next=${encodeURIComponent("/sell")}`); };
 
   useEffect(() => {
@@ -23,13 +25,13 @@ export function Layout() {
         <Link to="/" className="brand" onClick={close}><span className="brand-icon">M</span><span>Milly</span></Link>
         <nav className={open ? "main-nav nav-open" : "main-nav"}>
           <NavLink to="/listings" onClick={close}><Search size={16} />Browse</NavLink>
-          <NavLink to="/favorites" onClick={close}><Heart size={16} />Favorites</NavLink>
+          <NavLink to={user ? "/favorites" : "/register?next=/favorites"} onClick={close}><Heart size={16} />Favorites</NavLink>
           {user && <NavLink to="/my-listings" onClick={close}><Store size={16} />My listings</NavLink>}
           {user ? <NavLink to="/account" onClick={close}><UserRound size={16} />{user.name.split(" ")[0]}</NavLink> : <NavLink to="/login" onClick={close}><LogIn size={16} />Sign in</NavLink>}
           {user && <button className="nav-link nav-logout" onClick={() => { void logout(); close(); }}>Log out</button>}
         </nav>
         <div className="header-actions">
-          <Button size="sm" disabled={sellNavigating || location.pathname === "/sell"} onClick={goToSell}><Plus size={16} />Sell an item</Button>
+          {showCreateAccount ? <Button size="sm" onClick={() => navigate("/register")}>Create An Account</Button> : hideSell ? null : <Button size="sm" disabled={sellNavigating || location.pathname === "/sell"} onClick={goToSell}><Plus size={16} />Sell A Product</Button>}
           <button className="mobile-menu" aria-label="Toggle menu" onClick={() => setOpen((current) => !current)}>{open ? <X /> : <Menu />}</button>
         </div>
       </div>

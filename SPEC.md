@@ -274,6 +274,8 @@ Supported listing query parameters should include:
 - `/listings/:id` — listing detail
 - `/sell` — create listing
 - `/listings/:id/edit` — edit own listing
+- `/published-products` — seller's published listings
+- `/archive-products` — seller's archived listings
 - `/favorites` — saved listings
 - `/profile/:id` — public seller profile
 - `/account` — current user's profile and settings

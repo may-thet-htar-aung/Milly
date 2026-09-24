@@ -1,4 +1,4 @@
-import { Heart, MapPin, ArrowUpRight } from "lucide-react";
+import { Eye, Heart, MapPin, ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { Listing } from "../types";
@@ -23,10 +23,9 @@ export function ListingCard({ listing, onFavorite, showStatus = false, renderAct
       <div className="listing-card-topline"><div className="listing-card-badges"><Badge tone="green">{listing.currency}</Badge>{showStatus && <Badge tone={listingStatusTone(listing.status)}>{formatListingStatus(listing.status)}</Badge>}</div><span className="listing-category">{listing.category.name}</span></div>
       <Link to={`/listings/${listing.id}`} className="listing-title">{listing.title}</Link>
       <div className="listing-price">{formatPrice(listing.priceMinor, listing.currency)}</div>
-      <div className="listing-meta"><span><MapPin size={14} />{listing.location}</span><span>{listing.viewCount} views</span></div>
-      <div className="listing-card-actions">
-        <Link to={`/listings/${listing.id}`} className="text-link">View details <ArrowUpRight size={14} /></Link>
-        {renderActions ? renderActions(listing) : onFavorite && <Button variant="ghost" size="sm" className={listing.isFavorite ? "favorite-active" : "favorite-button"} aria-label={listing.isFavorite ? "Remove from favorites" : "Add to favorites"} onClick={() => onFavorite(listing)}><Heart size={18} fill={listing.isFavorite ? "currentColor" : "none"} /></Button>}
+      <div className="listing-meta"><span><MapPin size={14} />{listing.location}</span><span><Eye size={14} />{listing.viewCount} views</span></div>
+      <div className={renderActions ? "listing-card-actions listing-card-actions-seller" : "listing-card-actions"}>
+        {renderActions ? renderActions(listing) : <>{onFavorite && <Button variant="ghost" size="sm" className={listing.isFavorite ? "favorite-active" : "favorite-button"} aria-label={listing.isFavorite ? "Remove from favorites" : "Add to favorites"} onClick={() => onFavorite(listing)}><Heart size={18} fill={listing.isFavorite ? "currentColor" : "none"} /></Button>}<Link to={`/listings/${listing.id}`} className="text-link">View Details <ArrowUpRight size={14} /></Link></>}
       </div>
     </div>
   </Card>;
