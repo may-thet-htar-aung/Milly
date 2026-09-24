@@ -11,7 +11,7 @@ export const listingsRouter = Router();
 
 const imageUrlSchema = z.union([
   z.string().url().max(2048),
-  z.string().regex(/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/).max(1_500_000),
+  z.string().regex(/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/).max(7_000_000),
 ]);
 const imageSchema = z.object({ url: imageUrlSchema, altText: z.string().trim().max(160).optional() });
 const listingInputSchema = z.object({
