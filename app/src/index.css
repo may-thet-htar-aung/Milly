@@ -303,6 +303,11 @@ p { line-height: 1.65; }
 
 .account-page { padding-top: 48px; }
 .account-page > .form-success, .account-page > .form-error { margin: -12px 0 22px; }
+.seller-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.seller-filter { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: white; font-size: .84rem; font-weight: 600; }
+.seller-filter span { min-width: 1.4rem; padding: 1px 6px; border-radius: 999px; color: var(--muted); background: #f3f4f8; font-size: .72rem; }
+.seller-filter.active { border-color: transparent; color: white; background: var(--purple); }
+.seller-filter.active span { color: white; background: rgba(255, 255, 255, .18); }
 .seller-listing-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
 .seller-listing-actions .button { min-height: 32px; padding: 7px 9px; font-size: .7rem; }
 .account-hero { display: flex; align-items: center; gap: 17px; padding-bottom: 31px; border-bottom: 1px solid var(--line); }

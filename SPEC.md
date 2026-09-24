@@ -277,7 +277,7 @@ Supported listing query parameters should include:
 - `/favorites` — saved listings
 - `/profile/:id` — public seller profile
 - `/account` — current user's profile and settings
-- `/my-listings` — seller dashboard
+- `/my-listings` — seller dashboard titled “Manage Your Product Listings,” grouped into All Listings, Published (active), Drafts, Pending Review (reserved), and Sold
 - `/login`
 - `/register`
 - `/admin/reports` — admin-only moderation view
