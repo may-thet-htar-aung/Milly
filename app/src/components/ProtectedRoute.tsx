@@ -6,5 +6,6 @@ export function ProtectedRoute() {
   const { user, loading } = useAuth();
   const location = useLocation();
   if (loading) return <div className="full-state"><Spinner /></div>;
-  return user ? <Outlet /> : <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
+  const destination = `${location.pathname}${location.search}`;
+  return user ? <Outlet /> : <Navigate to={`/login?next=${encodeURIComponent(destination)}`} replace />;
 }
