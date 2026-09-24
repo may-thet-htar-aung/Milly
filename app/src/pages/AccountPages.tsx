@@ -24,6 +24,7 @@ export function FavoritesPage() {
 
 export function MyListingsPage() {
   const { user } = useAuth(); const queryClient = useQueryClient(); const listings = useQuery({ queryKey: ["my-listings"], queryFn: api.myListings, enabled: Boolean(user) });
+  const [filter, setFilter] = useState<ListingFilter>("ALL");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const action = useMutation({
     mutationFn: async ({ id, type }: { id: string; type: ListingAction }) => {
@@ -45,10 +46,27 @@ export function MyListingsPage() {
     action.mutate({ id: listing.id, type });
   };
   const renderActions = (listing: Listing) => <div className="seller-listing-actions"><Link to={`/listings/${listing.id}/edit`}><Button variant="outline" size="sm">Edit</Button></Link>{listing.status === "DRAFT" && <Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Publish</Button>}{listing.status === "ACTIVE" && <><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "reserve")} disabled={action.isPending}>Reserve</Button><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "sold")} disabled={action.isPending}>Mark as Sold</Button></>}{listing.status === "RESERVED" && <><Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Make Active</Button><Button variant="outline" size="sm" onClick={() => confirmAction(listing, "sold")} disabled={action.isPending}>Mark as Sold</Button></>}{(listing.status === "DRAFT" || listing.status === "ACTIVE" || listing.status === "RESERVED") && <Button variant="danger" size="sm" onClick={() => confirmAction(listing, "archive")} disabled={action.isPending}><Archive size={14} />Archive</Button>}{(listing.status === "SOLD" || listing.status === "ARCHIVED") && <Button variant="secondary" size="sm" onClick={() => confirmAction(listing, "publish")} disabled={action.isPending}>Publish Again</Button>}</div>;
-  return <PageContainer className="account-page"><div className="page-heading"><div><span className="section-kicker">Your seller space</span><h1>Manage Your Listings.</h1><p>Review each listing and keep details fresh as its status changes.</p></div></div>{feedback && <div className={feedback.type === "success" ? "form-success" : "form-error"} role="status">{feedback.message}</div>}{listings.isLoading ? <div className="full-state"><Spinner /></div> : listings.isError ? <ErrorState message={listings.error instanceof Error ? listings.error.message : undefined} /> : listings.data?.data.length ? <ListingGrid listings={listings.data.data} showStatus renderActions={renderActions} /> : <div className="empty-state"><div className="empty-icon"><Package /></div><h2>No listings yet</h2><p>When you are ready, make some space and give an item a second life.</p><Link to="/sell"><Button>Sell An Item</Button></Link></div>}</PageContainer>;
+  const sellerListings = listings.data?.data ?? [];
+  const filteredListings = filter === "ALL" ? sellerListings : filter === "PENDING_REVIEW" ? [] : sellerListings.filter((listing) => listing.status === filter);
+  const emptyTitle = filter === "ALL" ? "No listings yet" : `No ${listingFilterLabel(filter).toLowerCase()} listings`;
+  const emptyDescription = filter === "PENDING_REVIEW" ? "Pending Review is not part of the current API workflow yet." : "When you are ready, make some space and give an item a second life.";
+  return <PageContainer className="account-page"><div className="page-heading"><div><span className="section-kicker">Your seller space</span><h1>Manage Your Product Listings</h1><p>Review each listing and keep details fresh as its status changes.</p></div></div>{feedback && <div className={feedback.type === "success" ? "form-success" : "form-error"} role="status">{feedback.message}</div>}<div className="listing-filters" role="tablist" aria-label="Filter your listings">{listingFilters.map((option) => <button type="button" key={option.value} className={filter === option.value ? "listing-filter active" : "listing-filter"} role="tab" aria-selected={filter === option.value} onClick={() => setFilter(option.value)}>{option.label}</button>)}</div>{listings.isLoading ? <div className="full-state"><Spinner /></div> : listings.isError ? <ErrorState message={listings.error instanceof Error ? listings.error.message : undefined} /> : filteredListings.length ? <ListingGrid listings={filteredListings} showStatus renderActions={renderActions} /> : <div className="empty-state"><div className="empty-icon"><Package /></div><h2>{emptyTitle}</h2><p>{emptyDescription}</p>{filter === "ALL" && <Link to="/sell"><Button>Sell An Item</Button></Link>}</div>}</PageContainer>;
 }
 
 type ListingAction = "publish" | "reserve" | "sold" | "archive";
+type ListingFilter = "ALL" | "ACTIVE" | "DRAFT" | "PENDING_REVIEW" | "SOLD";
+
+const listingFilters: { value: ListingFilter; label: string }[] = [
+  { value: "ALL", label: "All Listings" },
+  { value: "ACTIVE", label: "Published" },
+  { value: "DRAFT", label: "Drafts" },
+  { value: "PENDING_REVIEW", label: "Pending Review" },
+  { value: "SOLD", label: "Sold" },
+];
+
+function listingFilterLabel(filter: ListingFilter) {
+  return listingFilters.find((option) => option.value === filter)?.label ?? "Listings";
+}
 
 function actionSuccessLabel(type: ListingAction) {
   return type === "publish" ? "Listing published" : type === "reserve" ? "Listing reserved" : type === "sold" ? "Listing marked as sold" : "Listing archived";
