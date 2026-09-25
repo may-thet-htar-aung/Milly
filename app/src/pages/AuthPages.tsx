@@ -20,7 +20,7 @@ export function LoginPage() {
   const [params] = useSearchParams();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [error, setError] = useState(""); const [busy, setBusy] = useState(false);
   const next = safeNext(params.get("next"));
-  const submit = async (event: React.FormEvent) => { event.preventDefault(); setBusy(true); setError(""); try { await login(email, password); navigate(next); } catch (caught) { setError(caught instanceof Error ? caught.message : "Unable to sign in."); } finally { setBusy(false); } };
+  const submit = async (event: React.FormEvent) => { event.preventDefault(); setBusy(true); setError(""); try { const signedIn = await login(email, password); navigate(signedIn.role === "ADMIN" ? "/admin" : next); } catch (caught) { setError(caught instanceof Error ? caught.message : "Unable to sign in."); } finally { setBusy(false); } };
   const registerPath = next === "/" ? "/register" : `/register?next=${encodeURIComponent(next)}`;
   return <AuthShell title="Welcome Back" intro="Sign in to keep your favorites and listings close."><form className="auth-form" onSubmit={submit}><label className="field-label">Email<div className="input-icon"><Mail size={17} /><Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required /></div></label><label className="field-label">Password<PasswordField value={password} onChange={setPassword} /></label>{error && <div className="form-error">{error}</div>}<Button type="submit" size="lg" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button><p className="auth-switch">New to Milly? <Link to={registerPath}>Create An Account</Link></p></form></AuthShell>;
 }
