@@ -74,6 +74,7 @@ listingsRouter.get(
 
     const where = {
       status,
+      hiddenAt: null,
       ...(query.categoryId ? { categoryId: query.categoryId } : {}),
       ...(query.condition ? { condition: query.condition } : {}),
       ...(query.currency ? { currency: query.currency } : {}),
@@ -130,7 +131,7 @@ listingsRouter.get(
   authenticateOptional,
   asyncHandler(async (request, response) => {
     const listing = await getListingOrThrow(requiredParam(request.params.id, "id"));
-    if (listing.status !== ListingStatus.ACTIVE && !canManage(request.user, listing.sellerId)) {
+    if ((listing.hiddenAt || listing.status !== ListingStatus.ACTIVE) && !canManage(request.user, listing.sellerId)) {
       throw new AppError(404, "LISTING_NOT_FOUND", "Listing not found.");
     }
     await prisma.listing.update({ where: { id: listing.id }, data: { viewCount: { increment: 1 } } });

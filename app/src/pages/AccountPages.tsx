@@ -25,7 +25,7 @@ function AccountBackButton() {
 
 export function FavoritesPage() {
   const { user } = useAuth(); const favorites = useQuery({ queryKey: ["favorites"], queryFn: api.favorites, enabled: Boolean(user) });
-  return <PageContainer className="account-page"><AccountBackButton /><div className="page-heading"><div><span className="section-kicker">Your shelf</span><h1>Saved for later.</h1><p>The things that made you pause for a second look.</p></div></div>{favorites.isLoading ? <div className="full-state"><Spinner /></div> : favorites.isError ? <ErrorState /> : favorites.data?.data.length ? <ListingGrid listings={favorites.data.data} /> : <div className="empty-state"><div className="empty-icon"><Heart /></div><h2>Your shelf is still empty</h2><p>Tap the heart on a listing when something feels like a maybe.</p><Link to="/listings" className="text-link">Start browsing <ArrowRight size={15} /></Link></div>}</PageContainer>;
+  return <PageContainer className="account-page"><AccountBackButton /><div className="page-heading"><div><span className="section-kicker">Your shelf</span><h1>Saved for later.</h1><p>The things that made you pause for a second look.</p></div></div>{favorites.isLoading ? <div className="full-state"><Spinner /></div> : favorites.isError ? <ErrorState /> : favorites.data?.data.length ? <ListingGrid listings={favorites.data.data} /> : <div className="empty-state"><div className="empty-icon"><Heart /></div><h2>Your shelf is still empty</h2><p>Tap the heart on a listing when something feels like a maybe.</p><Link to="/listings" className="text-link">Start Browsing <ArrowRight size={15} /></Link></div>}</PageContainer>;
 }
 
 export function MyListingsPage() {

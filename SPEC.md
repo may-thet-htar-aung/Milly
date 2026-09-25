@@ -169,6 +169,8 @@ The exact token transport may differ by client:
 - Public users can browse active listings and public seller profiles.
 - Authenticated users can create listings, manage their own listings, favorite listings, and submit reports.
 - Only the listing owner or an admin can edit, reserve, archive, or mark a listing sold.
+- Admins manage marketplace listings, reports, and users. They do not use seller navigation or create listings for themselves.
+- Admin listing review tracks seller listings. Admins do not edit a seller's listing or change its seller-owned status from the admin listing page. Admins can hide a listing from the public marketplace; the seller still sees it in their own listings with its existing status.
 - Admin-only moderation endpoints must be protected by role checks.
 
 ## 8. API specification
@@ -213,7 +215,7 @@ The exact token transport may differ by client:
 #### Users
 
 - `GET /api/v1/users/:id`
-- `PATCH /api/v1/users/me`
+- `PATCH /api/v1/users/me` — profile fields. Email and password changes require the current password as authorization.
 - `GET /api/v1/users/me/listings`
 - `GET /api/v1/users/me/favorites`
 
@@ -253,8 +255,12 @@ Supported listing query parameters should include:
 
 - `GET /api/v1/admin/reports`
 - `PATCH /api/v1/admin/reports/:id`
+- `GET /api/v1/admin/listings` — optional `sellerId` limits results to one seller
+- `PATCH /api/v1/admin/listings/:id/visibility` — set `hidden` to hide a listing from the public marketplace or show it again, without changing the seller's listing status
 - `PATCH /api/v1/admin/listings/:id/status`
-- `PATCH /api/v1/admin/users/:id/status` (only if account suspension is implemented)
+- `GET /api/v1/admin/users`
+- `GET /api/v1/admin/users/:id` — seller account detail, including phone, location, and total, active, and archived listing counts
+- `PATCH /api/v1/admin/users/:id/status` — set `isActive` to deactivate or reactivate an account
 
 ## 9. Web application: `milly-app`
 
@@ -282,7 +288,15 @@ Supported listing query parameters should include:
 - `/my-listings` — seller dashboard titled “Manage Your Product Listings,” grouped into All Listings, Published (active), Drafts, Pending Review (reserved), and Sold
 - `/login`
 - `/register`
-- `/admin/reports` — admin-only moderation view
+- `/admin` — admin dashboard
+- `/admin/listings` — all marketplace listings
+- `/admin/listings/:id` — admin listing detail
+- `/admin/reports` — admin report queue
+- `/admin/reports/:id` — admin report detail
+- `/admin/users` — user management
+- `/admin/users/:id` — admin user detail
+- `/admin/account` — admin account
+- Admin navigation is Dashboard, Listings, Reports, Users, and Account. Admins do not use seller navigation.
 
 ### Required web experiences
 

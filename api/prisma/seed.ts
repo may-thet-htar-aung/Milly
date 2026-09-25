@@ -62,7 +62,7 @@ async function main() {
   }
 
   const passwordHash = await hashPassword("MillyDemo123!");
-  const admin = await prisma.user.create({ data: { id: "seed-admin", name: "Milly Admin", email: "admin@milly.local", passwordHash, role: Role.ADMIN, location: "Yangon" } });
+  const admin = await prisma.user.create({ data: { id: "seed-admin", name: "Milly Admin", email: "admin@milly.local", passwordHash, role: Role.ADMIN, location: "Yangon, Myanmar" } });
   const users = [];
   for (let index = 1; index <= 20; index += 1) {
     users.push(await prisma.user.create({

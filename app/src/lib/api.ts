@@ -1,4 +1,4 @@
-import type { AuthResponse, Category, Listing, Paginated, User } from "../types";
+import type { AdminUser, AuthResponse, Category, Listing, Paginated, Report, ReportStatus, User } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api/v1";
 const ACCESS_KEY = "milly_access_token";
@@ -58,6 +58,7 @@ export const api = {
   login: (body: { email: string; password: string }) => request<AuthResponse>("/auth/login", { method: "POST", body }),
   logout: () => request<void>("/auth/logout", { method: "POST", body: { refreshToken: tokenStore.refresh } }, false),
   me: () => request<{ user: User }>("/auth/me"),
+  updateProfile: (body: { phone?: string | null; location?: string | null; email?: string; currentPassword?: string; newPassword?: string }) => request<{ data: User }>("/users/me", { method: "PATCH", body }),
   user: (id: string) => request<{ data: User }>(`/users/${id}`),
   categories: () => request<{ data: Category[] }>("/categories"),
   listings: (params: URLSearchParams) => request<Paginated<Listing>>(`/listings?${params.toString()}`),
@@ -72,4 +73,12 @@ export const api = {
   archiveListing: (id: string) => request<void>(`/listings/${id}`, { method: "DELETE" }),
   favorite: (id: string) => request<void>(`/listings/${id}/favorite`, { method: "POST" }),
   unfavorite: (id: string) => request<void>(`/listings/${id}/favorite`, { method: "DELETE" }),
+  adminListings: (params: URLSearchParams) => request<Paginated<Listing>>(`/admin/listings?${params.toString()}`),
+  adminReports: () => request<{ data: Report[] }>("/admin/reports"),
+  updateReport: (id: string, status: ReportStatus) => request<{ data: Report }>(`/admin/reports/${id}`, { method: "PATCH", body: { status } }),
+  updateListingStatus: (id: string, status: Listing["status"]) => request<{ data: Listing }>(`/admin/listings/${id}/status`, { method: "PATCH", body: { status } }),
+  setListingVisibility: (id: string, hidden: boolean) => request<{ data: Listing }>(`/admin/listings/${id}/visibility`, { method: "PATCH", body: { hidden } }),
+  adminUsers: () => request<{ data: AdminUser[] }>("/admin/users"),
+  adminUser: (id: string) => request<{ data: AdminUser }>(`/admin/users/${id}`),
+  updateUserStatus: (id: string, isActive: boolean) => request<{ data: { id: string; isActive: boolean } }>(`/admin/users/${id}/status`, { method: "PATCH", body: { isActive } }),
 };

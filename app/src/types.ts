@@ -40,6 +40,7 @@ export interface Listing {
   currency: Currency;
   condition: ListingCondition;
   status: ListingStatus;
+  hiddenAt?: string | null;
   location: string;
   viewCount: number;
   publishedAt: string | null;
@@ -54,6 +55,33 @@ export interface Listing {
 export interface Paginated<T> {
   data: T[];
   meta: { page: number; pageSize: number; total: number; totalPages: number };
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "USER" | "ADMIN";
+  isActive: boolean;
+  createdAt: string;
+  listingCount: number;
+  phone?: string | null;
+  location?: string | null;
+  activeListingCount?: number;
+  archivedListingCount?: number;
+}
+
+export type ReportStatus = "PENDING" | "REVIEWING" | "RESOLVED" | "DISMISSED";
+
+export interface Report {
+  id: string;
+  reason: string;
+  details: string | null;
+  status: ReportStatus;
+  createdAt: string;
+  reporter: { id: string; name: string; email: string };
+  reportedUser: { id: string; name: string; email: string } | null;
+  listing: { id: string; title: string; status: ListingStatus } | null;
 }
 
 export interface AuthResponse {
