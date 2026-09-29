@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import { useI18n } from "../i18n";
 import { cn } from "../lib/utils";
 
 export function Button({ className, variant = "primary", size = "md", ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost" | "outline" | "danger"; size?: "sm" | "md" | "lg" }) {
@@ -21,8 +22,12 @@ export function Badge({ children, tone = "default" }: { children: ReactNode; ton
   return <span className={cn("badge", `badge-${tone}`)}>{children}</span>;
 }
 
-export function Spinner() { return <span className="spinner" aria-label="Loading" />; }
+export function Spinner() {
+  const { t } = useI18n();
+  return <span className="spinner" aria-label={t("loading")} />;
+}
 
-export function ErrorState({ message = "We couldn't load this right now." }: { message?: string }) {
-  return <div className="state state-error"><strong>Something went wrong</strong><span>{message}</span></div>;
+export function ErrorState({ message }: { message?: string }) {
+  const { t } = useI18n();
+  return <div className="state state-error"><strong>{t("somethingWrong")}</strong><span>{message ?? t("loadFailed")}</span></div>;
 }
