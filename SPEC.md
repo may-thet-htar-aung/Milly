@@ -22,6 +22,7 @@ For v1, Milly focuses on second-hand marketplace discovery and seller-managed li
 - favorite listings and view saved listings;
 - view seller profiles and report listings;
 - provide the core experience through web and mobile clients;
+- switch the web interface between English and Burmese, keeping technical terms and well-known UI labels in English;
 - protect moderation operations behind admin authorization.
 
 Payments, checkout, orders, shipping, real-time messaging, notifications, auctions, and identity verification are outside this feature focus unless this specification is explicitly amended.
@@ -190,7 +191,7 @@ The exact token transport may differ by client:
 
 - Base path: `/api/v1`.
 - JSON responses use consistent envelopes for errors and paginated collections.
-- Dates are ISO 8601 UTC strings.
+- Dates are ISO 8601 UTC strings. Clients display them with the language formats in Date display.
 - IDs are opaque strings; UUIDs are recommended.
 - List endpoints use `page`, `pageSize`, and stable sorting.
 - Default listing sort: newest first.
@@ -309,6 +310,17 @@ Supported listing query parameters should include:
 - Accessible forms with client and server validation.
 - Responsive layout for desktop, tablet, and mobile browser widths.
 
+### Date display
+
+Shown dates follow the user's chosen language. Stored and API dates stay ISO 8601 UTC strings.
+
+| Language | Format | Example |
+|---|---|---|
+| English | `dd/mm/yyyy` | `01/09/2026` |
+| Burmese | Myanmar digits, `{day}ရက် {month}လ {year}` | `၀၁ရက် ၀၉လ ၂၀၂၆` |
+
+English uses a two-digit day, two-digit month, and four-digit year, separated by slashes. Burmese uses Myanmar numerals, a two-digit day followed by `ရက်`, a two-digit month followed by `လ`, and a four-digit year.
+
 ### Web state rules
 
 - React Query owns server state.
@@ -350,6 +362,7 @@ Stack screens should include listing detail, seller profile, create/edit listing
 - Manage listing status.
 - Submit reports.
 - Handle offline/loading/error states gracefully.
+- Display dates with the same English and Burmese formats as the web client.
 
 Mobile-specific behavior should include safe-area support, keyboard-aware forms, platform-appropriate permissions, and accessible touch targets.
 
@@ -457,6 +470,7 @@ Recommended shared conventions:
 - An authenticated user can create a listing with title, description, price, currency, category, condition, location, and images.
 - A seller can publish, edit, reserve, mark sold, and archive their own listing.
 - A visitor can search, filter, paginate, and view active listings in both USD and MMK.
+- Shown dates use `dd/mm/yyyy` in English and `၀၁ရက် ၀၉လ ၂၀၂၆` in Burmese.
 - A user can favorite/unfavorite a listing and view their favorites.
 - A user can view a seller profile and report a listing.
 - Admin-protected moderation endpoints and UI prevent unauthorized access.
