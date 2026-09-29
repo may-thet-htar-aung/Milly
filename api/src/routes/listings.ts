@@ -11,7 +11,7 @@ export const listingsRouter = Router();
 
 const imageUrlSchema = z.union([
   z.string().url().max(2048),
-  z.string().regex(/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/).max(1_500_000),
+  z.string().regex(/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/).max(7_000_000),
 ]);
 const imageSchema = z.object({ url: imageUrlSchema, altText: z.string().trim().max(160).optional() });
 const listingInputSchema = z.object({
@@ -74,6 +74,7 @@ listingsRouter.get(
 
     const where = {
       status,
+      hiddenAt: null,
       ...(query.categoryId ? { categoryId: query.categoryId } : {}),
       ...(query.condition ? { condition: query.condition } : {}),
       ...(query.currency ? { currency: query.currency } : {}),
@@ -130,7 +131,7 @@ listingsRouter.get(
   authenticateOptional,
   asyncHandler(async (request, response) => {
     const listing = await getListingOrThrow(requiredParam(request.params.id, "id"));
-    if (listing.status !== ListingStatus.ACTIVE && !canManage(request.user, listing.sellerId)) {
+    if ((listing.hiddenAt || listing.status !== ListingStatus.ACTIVE) && !canManage(request.user, listing.sellerId)) {
       throw new AppError(404, "LISTING_NOT_FOUND", "Listing not found.");
     }
     await prisma.listing.update({ where: { id: listing.id }, data: { viewCount: { increment: 1 } } });

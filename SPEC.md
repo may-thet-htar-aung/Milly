@@ -22,6 +22,7 @@ For v1, Milly focuses on second-hand marketplace discovery and seller-managed li
 - favorite listings and view saved listings;
 - view seller profiles and report listings;
 - provide the core experience through web and mobile clients;
+- switch the web interface between English and Burmese, keeping technical terms and well-known UI labels in English;
 - protect moderation operations behind admin authorization.
 
 Payments, checkout, orders, shipping, real-time messaging, notifications, auctions, and identity verification are outside this feature focus unless this specification is explicitly amended.
@@ -169,6 +170,8 @@ The exact token transport may differ by client:
 - Public users can browse active listings and public seller profiles.
 - Authenticated users can create listings, manage their own listings, favorite listings, and submit reports.
 - Only the listing owner or an admin can edit, reserve, archive, or mark a listing sold.
+- Admins manage marketplace listings, reports, and users. They do not use seller navigation or create listings for themselves.
+- Admin listing review tracks seller listings. Admins do not edit a seller's listing or change its seller-owned status from the admin listing page. Admins can hide a listing from the public marketplace; the seller still sees it in their own listings with its existing status.
 - Admin-only moderation endpoints must be protected by role checks.
 
 ## 8. API specification
@@ -188,7 +191,7 @@ The exact token transport may differ by client:
 
 - Base path: `/api/v1`.
 - JSON responses use consistent envelopes for errors and paginated collections.
-- Dates are ISO 8601 UTC strings.
+- Dates are ISO 8601 UTC strings. Clients display them with the language formats in Date display.
 - IDs are opaque strings; UUIDs are recommended.
 - List endpoints use `page`, `pageSize`, and stable sorting.
 - Default listing sort: newest first.
@@ -213,7 +216,7 @@ The exact token transport may differ by client:
 #### Users
 
 - `GET /api/v1/users/:id`
-- `PATCH /api/v1/users/me`
+- `PATCH /api/v1/users/me` — profile fields. Email and password changes require the current password as authorization.
 - `GET /api/v1/users/me/listings`
 - `GET /api/v1/users/me/favorites`
 
@@ -253,8 +256,12 @@ Supported listing query parameters should include:
 
 - `GET /api/v1/admin/reports`
 - `PATCH /api/v1/admin/reports/:id`
+- `GET /api/v1/admin/listings` — optional `sellerId` limits results to one seller
+- `PATCH /api/v1/admin/listings/:id/visibility` — set `hidden` to hide a listing from the public marketplace or show it again, without changing the seller's listing status
 - `PATCH /api/v1/admin/listings/:id/status`
-- `PATCH /api/v1/admin/users/:id/status` (only if account suspension is implemented)
+- `GET /api/v1/admin/users`
+- `GET /api/v1/admin/users/:id` — seller account detail, including phone, location, and total, active, and archived listing counts
+- `PATCH /api/v1/admin/users/:id/status` — set `isActive` to deactivate or reactivate an account
 
 ## 9. Web application: `milly-app`
 
@@ -274,13 +281,23 @@ Supported listing query parameters should include:
 - `/listings/:id` — listing detail
 - `/sell` — create listing
 - `/listings/:id/edit` — edit own listing
+- `/published-products` — seller's published listings
+- `/archive-products` — seller's archived listings
 - `/favorites` — saved listings
 - `/profile/:id` — public seller profile
 - `/account` — current user's profile and settings
-- `/my-listings` — seller dashboard
+- `/my-listings` — seller dashboard titled “Manage Your Product Listings,” grouped into All Listings, Published (active), Drafts, Pending Review (reserved), and Sold
 - `/login`
 - `/register`
-- `/admin/reports` — admin-only moderation view
+- `/admin` — admin dashboard
+- `/admin/listings` — all marketplace listings
+- `/admin/listings/:id` — admin listing detail
+- `/admin/reports` — admin report queue
+- `/admin/reports/:id` — admin report detail
+- `/admin/users` — user management
+- `/admin/users/:id` — admin user detail
+- `/admin/account` — admin account
+- Admin navigation is Dashboard, Listings, Reports, Users, and Account. Admins do not use seller navigation.
 
 ### Required web experiences
 
@@ -292,6 +309,17 @@ Supported listing query parameters should include:
 - Authenticated seller flow for drafting, publishing, editing, reserving, selling, and archiving listings.
 - Accessible forms with client and server validation.
 - Responsive layout for desktop, tablet, and mobile browser widths.
+
+### Date display
+
+Shown dates follow the user's chosen language. Stored and API dates stay ISO 8601 UTC strings.
+
+| Language | Format | Example |
+|---|---|---|
+| English | `dd/mm/yyyy` | `01/09/2026` |
+| Burmese | Myanmar digits, `{day}ရက် {month}လ {year}` | `၀၁ရက် ၀၉လ ၂၀၂၆` |
+
+English uses a two-digit day, two-digit month, and four-digit year, separated by slashes. Burmese uses Myanmar numerals, a two-digit day followed by `ရက်`, a two-digit month followed by `လ`, and a four-digit year.
 
 ### Web state rules
 
@@ -334,6 +362,7 @@ Stack screens should include listing detail, seller profile, create/edit listing
 - Manage listing status.
 - Submit reports.
 - Handle offline/loading/error states gracefully.
+- Display dates with the same English and Burmese formats as the web client.
 
 Mobile-specific behavior should include safe-area support, keyboard-aware forms, platform-appropriate permissions, and accessible touch targets.
 
@@ -441,6 +470,7 @@ Recommended shared conventions:
 - An authenticated user can create a listing with title, description, price, currency, category, condition, location, and images.
 - A seller can publish, edit, reserve, mark sold, and archive their own listing.
 - A visitor can search, filter, paginate, and view active listings in both USD and MMK.
+- Shown dates use `dd/mm/yyyy` in English and `၀၁ရက် ၀၉လ ၂၀၂၆` in Burmese.
 - A user can favorite/unfavorite a listing and view their favorites.
 - A user can view a seller profile and report a listing.
 - Admin-protected moderation endpoints and UI prevent unauthorized access.

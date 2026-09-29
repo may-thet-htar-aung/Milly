@@ -19,7 +19,7 @@ app.disable("x-powered-by");
 app.use(helmet());
 app.use(cors({ origin: config.WEB_ORIGIN, credentials: true }));
 app.use(cookieParser());
-app.use(express.json({ limit: "8mb" }));
+app.use(express.json({ limit: "40mb" }));
 app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false }));
 
 app.get("/", (_request, response) => response.json({ service: "milly-api", version: "v1" }));
