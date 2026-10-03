@@ -589,6 +589,8 @@ p { line-height: 1.65; }
 :lang(my) .hero-copy h1 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: normal; letter-spacing: normal; }
 :lang(my) .badge, :lang(my) .image-condition, :lang(my) .seller-status, :lang(my) .admin-account-section h2 { line-height: normal; letter-spacing: normal; text-transform: none; }
 :lang(my) .badge { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; padding-top: 6px; padding-bottom: 6px; }
+:lang(my) .admin-account-section span, :lang(my) .admin-account-section strong { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: normal; letter-spacing: normal; text-transform: none; }
+:lang(my) .admin-account-section p { gap: 6px; }
 :lang(my) .admin-metrics strong { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: normal; letter-spacing: normal; }
 :lang(my) .listing-title { min-height: 4.4em; line-height: normal; }
 :lang(my) .detail-facts, :lang(my) .safety-note, :lang(my) .form-hint, :lang(my) .sell-side-tip, :lang(my) .attachment-picker small, :lang(my) .attachment-note, :lang(my) .textarea, :lang(my) .account-grid p { line-height: normal; }
