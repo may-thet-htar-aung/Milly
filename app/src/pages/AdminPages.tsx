@@ -95,7 +95,7 @@ export function AdminListingDetailPage() {
   if (listing.isLoading) return <PageContainer className="account-page"><div className="full-state"><Spinner /></div></PageContainer>;
   if (listing.isError || !item) return <PageContainer className="account-page"><ErrorState message={listing.error instanceof Error ? listing.error.message : "Listing not found."} /></PageContainer>;
   const hidden = Boolean(item.hiddenAt);
-  return <PageContainer className="account-page admin-page"><StatusToast message={notice} /><AdminHeading kicker={t("listingManagement")} title={item.title} text={`${item.category.name} · ${formatListingStatus(item.status)}`} crumbs={[{ label: "Dashboard", to: "/admin" }, { label: "Listings", to: "/admin/listings" }, { label: item.title }]} /><div className="admin-detail"><div>{item.images[0] ? <img className="admin-photo" src={item.images[0].url} alt="" /> : <div className="image-placeholder large" />}<p className="detail-description">{item.description}</p></div><Card className="admin-side admin-listing-side"><p><span>{t("price")}</span><strong>{formatPrice(item.priceMinor, item.currency)}</strong></p><p><span>{t("location")}</span><strong>{item.location}</strong></p><p><span>{t("seller")}</span><Link to={`/admin/users/${item.sellerId}`}><strong>{item.seller.name}</strong></Link></p><p><span>{t("created")}</span><strong>{formatDate(item.createdAt)}</strong></p><p><span>{t("status")}</span><Badge tone={listingStatusTone(item.status)}>{item.status === "ACTIVE" ? t("active") : item.status === "DRAFT" ? t("draft") : item.status === "RESERVED" ? t("reserved") : item.status === "SOLD" ? t("sold") : item.status === "ARCHIVED" ? t("archived") : formatListingStatus(item.status)}</Badge></p>{hidden && <p className="admin-hidden-note">Hidden from the marketplace. The seller can still see this listing.</p>}{error && <div className="form-error">{error}</div>}<div className="admin-actions"><Button variant="outline" disabled={visibility.isPending} onClick={() => { setError(""); setNotice(""); setConfirmHide(true); }}>{hidden ? t("unhideListing") : t("hideListing")}</Button><Link to={`/admin/users/${item.sellerId}`}><Button>{t("viewSeller")}</Button></Link></div>{confirmHide && <div className="success-popup" role="dialog" aria-modal="true" aria-labelledby="hide-listing-title"><div className="success-popup-card"><h2 id="hide-listing-title">{hidden ? t("unhideListingTitle") : t("hideListingTitle")}</h2><p>{hidden ? t("unhideListingBody") : t("hideListingBody")}</p>{error && <div className="form-error">{error}</div>}<div className="success-popup-actions"><Button variant="outline" className="account-status-cancel" disabled={visibility.isPending} onClick={() => setConfirmHide(false)}>Cancel</Button><Button disabled={visibility.isPending} onClick={() => visibility.mutate(!hidden)}>{visibility.isPending ? (hidden ? "Unhiding…" : "Hiding…") : (hidden ? t("unhideListing") : t("hideListing"))}</Button></div></div></div>}</Card></div></PageContainer>;
+  return <PageContainer className="account-page admin-page"><StatusToast message={notice} /><AdminHeading kicker={t("listingManagement")} title={item.title} text={`${item.category.name} · ${formatListingStatus(item.status)}`} crumbs={[{ label: "Dashboard", to: "/admin" }, { label: "Listings", to: "/admin/listings" }, { label: item.title }]} /><div className="admin-detail"><div>{item.images[0] ? <img className="admin-photo" src={item.images[0].url} alt="" /> : <div className="image-placeholder large" />}<p className="detail-description">{item.description}</p></div><Card className="admin-side admin-listing-side"><p><span>{t("price")}</span><strong>{formatPrice(item.priceMinor, item.currency)}</strong></p><p><span>{t("location")}</span><strong>{item.location}</strong></p><p><span>{t("seller")}</span><Link to={`/admin/users/${item.sellerId}`}><strong>{item.seller.name}</strong></Link></p><p><span>{t("created")}</span><strong>{formatDate(item.createdAt)}</strong></p><p><span>{t("status")}</span><Badge tone={listingStatusTone(item.status)}>{item.status === "ACTIVE" ? t("active") : item.status === "DRAFT" ? t("draft") : item.status === "RESERVED" ? t("reserved") : item.status === "SOLD" ? t("sold") : item.status === "ARCHIVED" ? t("archived") : formatListingStatus(item.status)}</Badge></p>{hidden && <p className="admin-hidden-note">Hidden from the marketplace. The seller can still see this listing.</p>}{error && <div className="form-error">{error}</div>}<div className="admin-actions"><Button variant="outline" disabled={visibility.isPending} onClick={() => { setError(""); setNotice(""); setConfirmHide(true); }}>{hidden ? t("unhideListing") : t("hideListing")}</Button><Link to={`/admin/users/${item.sellerId}`}><Button>{t("viewSeller")}</Button></Link></div>{confirmHide && <div className="success-popup" role="dialog" aria-modal="true" aria-labelledby="hide-listing-title"><div className="success-popup-card"><h2 id="hide-listing-title">{hidden ? t("unhideListingTitle") : t("hideListingTitle")}</h2><p>{hidden ? t("unhideListingBody") : t("hideListingBody")}</p>{error && <div className="form-error">{error}</div>}<div className="success-popup-actions"><Button variant="outline" className="account-status-cancel" disabled={visibility.isPending} onClick={() => setConfirmHide(false)}>{t("cancel")}</Button><Button disabled={visibility.isPending} onClick={() => visibility.mutate(!hidden)}>{visibility.isPending ? (hidden ? "Unhiding…" : "Hiding…") : (hidden ? t("unhideListing") : t("hideListingConfirm"))}</Button></div></div></div>}</Card></div></PageContainer>;
 }
 
 function StatusToast({ message }: { message: string }) {
@@ -120,6 +120,7 @@ export function AdminReportsPage() {
 }
 
 export function AdminReportDetailPage() {
+  const { t } = useI18n();
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -148,18 +149,20 @@ export function AdminReportDetailPage() {
     if (!selected || selected === report.status || update.isPending) return;
     update.mutate(selected);
   };
+  const reasonLabel = report.reason === "SPAM" ? t("spam") : report.reason === "INACCURATE_INFORMATION" ? t("inaccurateInformation") : formatCondition(report.reason);
+  const statusText = report.status === "PENDING" ? t("open") : report.status === "REVIEWING" ? t("inReview") : report.status === "RESOLVED" ? t("resolved") : report.status === "DISMISSED" ? t("dismissed") : reportStatusLabel(report.status);
   return (
     <PageContainer className="account-page admin-page">
       <StatusToast message={toast} />
-      <AdminHeading kicker="Report detail" title={formatCondition(report.reason)} text={reportStatusLabel(report.status)} crumbs={[{ label: "Dashboard", to: "/admin" }, { label: "Reports", to: "/admin/reports" }, { label: formatCondition(report.reason) }]} />
+      <AdminHeading kicker={t("reportDetail")} title={reasonLabel} text={statusText} crumbs={[{ label: "Dashboard", to: "/admin" }, { label: "Reports", to: "/admin/reports" }, { label: reasonLabel }]} />
       <Card className="admin-side admin-account-card">
         <section className="admin-account-section">
-          <div className="admin-section-heading"><h2>Report Information</h2></div>
-          <p><span>Reason</span><strong>{formatCondition(report.reason)}</strong></p>
-          {report.details && <p><span>Details</span><strong>{report.details}</strong></p>}
-          <p><span>Reported Date</span><strong>{formatDate(report.createdAt)}</strong></p>
-          <p><span>Status</span><Badge tone={report.status === "RESOLVED" ? "green" : report.status === "PENDING" ? "amber" : report.status === "DISMISSED" ? "pink" : "default"}>{reportStatusLabel(report.status)}</Badge></p>
-          <p><span>Reporter</span><strong>{report.reporter.name}</strong></p>
+          <div className="admin-section-heading"><h2>{t("reportInfo")}</h2></div>
+          <p><span>{t("reason")}</span><strong>{report.reason === "SPAM" ? t("spam") : report.reason === "INACCURATE_INFORMATION" ? t("inaccurateInformation") : formatCondition(report.reason)}</strong></p>
+          {report.details && <p><span>{t("details")}</span><strong>{report.details === "Repeated duplicate listings." ? t("repeatedListings") : report.details}</strong></p>}
+          <p><span>{t("reportedDate")}</span><strong>{formatDate(report.createdAt)}</strong></p>
+          <p><span>{t("status")}</span><Badge tone={report.status === "RESOLVED" ? "green" : report.status === "PENDING" ? "amber" : report.status === "DISMISSED" ? "pink" : "default"}>{report.status === "PENDING" ? t("open") : report.status === "REVIEWING" ? t("inReview") : report.status === "RESOLVED" ? t("resolved") : report.status === "DISMISSED" ? t("dismissed") : reportStatusLabel(report.status)}</Badge></p>
+          <p><span>{t("reporter")}</span><strong>{report.reporter.name}</strong></p>
         </section>
         <section className="admin-account-section">
           <div className="admin-section-heading"><h2>Reported Target</h2></div>
@@ -182,15 +185,16 @@ export function AdminReportDetailPage() {
 const accountStatusLabel = (isActive: boolean) => (isActive ? "Active" : "Deactivated");
 
 function AccountStatusDialog({ active, pending, error, onCancel, onConfirm }: { active: boolean; pending: boolean; error: string; onCancel: () => void; onConfirm: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="success-popup" role="dialog" aria-modal="true" aria-labelledby="account-status-title">
       <div className="success-popup-card">
-        <h2 id="account-status-title">{active ? "Deactivate seller account?" : "Reactivate seller account?"}</h2>
-        <p>{active ? "This will prevent this seller from using their account." : "This will allow the seller to use their account again."}</p>
+        <h2 id="account-status-title">{active ? t("deactivateSellerTitle") : t("reactivateSellerTitle")}</h2>
+        <p>{active ? t("deactivateSellerBody") : t("reactivateSellerBody")}</p>
         {error && <div className="form-error">{error}</div>}
         <div className="success-popup-actions">
-          <Button variant="outline" className="account-status-cancel" disabled={pending} onClick={onCancel}>Cancel</Button>
-          <Button variant={active ? "danger" : "primary"} disabled={pending} onClick={onConfirm}>{pending ? (active ? "Deactivating…" : "Reactivating…") : (active ? "Deactivate Account" : "Reactivate Account")}</Button>
+          <Button variant="outline" className="account-status-cancel" disabled={pending} onClick={onCancel}>{t("cancel")}</Button>
+          <Button variant={active ? "danger" : "primary"} disabled={pending} onClick={onConfirm}>{pending ? (active ? "Deactivating…" : "Reactivating…") : (active ? t("deactivateAccount") : t("reactivateAccount"))}</Button>
         </div>
       </div>
     </div>
@@ -198,6 +202,7 @@ function AccountStatusDialog({ active, pending, error, onCancel, onConfirm }: { 
 }
 
 function SellerActionsMenu({ user }: { user: AdminUser }) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -226,8 +231,8 @@ function SellerActionsMenu({ user }: { user: AdminUser }) {
       <button type="button" className="admin-icon-action" aria-label="Account actions" aria-haspopup="menu" aria-expanded={open} onClick={(event) => { event.stopPropagation(); setOpen((current) => !current); }}><EllipsisVertical size={16} /></button>
       {open && (
         <ul className="sort-menu-list" role="menu">
-          <li><button type="button" role="menuitem" className="sort-menu-option" onClick={() => navigate(`/admin/users/${user.id}`)}>View Details</button></li>
-          {user.role === "USER" && <li><button type="button" role="menuitem" className={user.isActive ? "sort-menu-option danger" : "sort-menu-option"} onClick={() => { setOpen(false); setError(""); setConfirming(true); }}>{user.isActive ? "Deactivate Account" : "Reactivate Account"}</button></li>}
+          <li><button type="button" role="menuitem" className="sort-menu-option" onClick={() => navigate(`/admin/users/${user.id}`)}>{t("viewDetails")}</button></li>
+          {user.role === "USER" && <li><button type="button" role="menuitem" className={user.isActive ? "sort-menu-option danger" : "sort-menu-option"} onClick={() => { setOpen(false); setError(""); setConfirming(true); }}>{user.isActive ? t("deactivateAccount") : "Reactivate Account"}</button></li>}
         </ul>
       )}
       {confirming && <AccountStatusDialog active={user.isActive} pending={update.isPending} error={error} onCancel={() => { if (!update.isPending) { setConfirming(false); setError(""); } }} onConfirm={() => update.mutate()} />}
