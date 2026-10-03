@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import en, { type MessageKey } from "./en";
 import my from "./my";
 
+export type { MessageKey };
 export type Language = "en" | "my";
 
 const catalogs = { en, my };

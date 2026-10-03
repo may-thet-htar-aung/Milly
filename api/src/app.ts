@@ -17,7 +17,9 @@ export const app = express();
 
 app.disable("x-powered-by");
 app.use(helmet());
-app.use(cors({ origin: config.WEB_ORIGIN, credentials: true }));
+const devOrigins = config.NODE_ENV === "production" ? [] : ["http://localhost:5173", "http://127.0.0.1:5173"];
+const webOrigins = [...new Set([config.WEB_ORIGIN, ...devOrigins])];
+app.use(cors({ origin: webOrigins, credentials: true }));
 app.use(cookieParser());
 app.use(express.json({ limit: "40mb" }));
 app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false }));

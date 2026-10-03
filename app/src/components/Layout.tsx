@@ -7,7 +7,7 @@ import { Button } from "./ui";
 
 export function Layout() {
   const { user, logout } = useAuth();
-  const { language, setLanguage, t } = useI18n();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [sellNavigating, setSellNavigating] = useState(false);
   const location = useLocation();
