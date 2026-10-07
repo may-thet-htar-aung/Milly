@@ -2,13 +2,13 @@ import { ArrowLeft, Check, Eye, EyeOff, LockKeyhole, Mail, UserRound } from "luc
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Card, Input } from "../components/ui";
-import { LanguageSwitch, PageContainer } from "../components/Layout";
+import { PageContainer } from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
 import { useI18n } from "../i18n";
 
 function AuthShell({ title, intro, children }: { title: string; intro: string; children: React.ReactNode }) {
   const { t } = useI18n();
-  return <PageContainer className="auth-page"><Link to="/" className="back-link"><ArrowLeft size={16} />{t("backMilly")}</Link><div className="auth-layout"><div className="auth-aside"><span className="eyebrow"><span className="brand-icon small">M</span>{t("welcomeMilly")}</span><h1>{t("authHeadline")}</h1><p>{t("authAside")}</p><div className="auth-points"><span><Check size={15} />{t("localSellers")}</span><span><Check size={15} />{t("pricing")}</span><span><Check size={15} />{t("noPayment")}</span></div></div><Card className="auth-card"><div className="auth-card-heading"><span className="section-kicker">{t("yourAccount")}</span><LanguageSwitch /></div><h2>{title}</h2><p>{intro}</p>{children}</Card></div></PageContainer>;
+  return <PageContainer className="auth-page"><Link to="/" className="back-link"><ArrowLeft size={16} />{t("backMilly")}</Link><div className="auth-layout"><div className="auth-aside"><span className="eyebrow"><span className="brand-icon small">M</span>{t("welcomeMilly")}</span><h1>{t("authHeadline")}</h1><p>{t("authAside")}</p><div className="auth-points"><span><Check size={15} />{t("localSellers")}</span><span><Check size={15} />{t("pricing")}</span><span><Check size={15} />{t("noPayment")}</span></div></div><Card className="auth-card"><div className="auth-card-heading"><span className="section-kicker">{t("yourAccount")}</span></div><h2>{title}</h2><p>{intro}</p>{children}</Card></div></PageContainer>;
 }
 
 function PasswordField({ value, onChange, placeholder }: { value: string; onChange: (value: string) => void; placeholder?: string }) {
