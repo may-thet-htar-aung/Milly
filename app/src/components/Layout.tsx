@@ -1,8 +1,9 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Flag, Heart, LayoutDashboard, LogIn, Menu, Plus, Search, Store, UserRound, Users, X } from "lucide-react";
+import { SegmentedControl } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useI18n, type Language } from "../i18n";
+import { useI18n } from "../i18n";
 import { Button } from "./ui";
 
 export function Layout() {
@@ -42,6 +43,7 @@ export function Layout() {
           {user && <button className="nav-link nav-logout" onClick={() => { void logout(); close(); }}>{t("logOut")}</button>}
         </nav>
         <div className="header-actions">
+          <LanguageSwitch />
           {isAdmin ? null : showCreateAccount ? <Button size="sm" onClick={() => navigate("/register")}>{t("signUp")}</Button> : hideSell ? null : <Button size="sm" disabled={sellNavigating || location.pathname === "/sell"} onClick={goToSell}><Plus size={16} />{t("sellProduct")}</Button>}
           <button className="mobile-menu" aria-label={open ? t("closeMenu") : t("menu")} onClick={() => setOpen((current) => !current)}>{open ? <X /> : <Menu />}</button>
         </div>
@@ -52,17 +54,9 @@ export function Layout() {
   </div>;
 }
 
-function LanguageFlag({ language }: { language: Language }) {
-  if (language === "en") {
-    return <svg className="language-flag" viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169" /><path d="M0 0 L60 30 M60 0 L0 30" stroke="#fff" strokeWidth="6" /><path d="M0 0 L60 30 M60 0 L0 30" stroke="#C8102E" strokeWidth="4" /><path d="M30 0 V30 M0 15 H60" stroke="#fff" strokeWidth="10" /><path d="M30 0 V30 M0 15 H60" stroke="#C8102E" strokeWidth="6" /></svg>;
-  }
-  return <svg className="language-flag" viewBox="0 0 18 12" aria-hidden="true"><rect width="18" height="4" fill="#FECB00" /><rect y="4" width="18" height="4" fill="#34B233" /><rect y="8" width="18" height="4" fill="#EA2839" /><path fill="#fff" d="M9 3.2 9.7 5.3h2.2l-1.8 1.3.7 2.1L9 7.4l-1.8 1.3.7-2.1-1.8-1.3h2.2z" /></svg>;
-}
-
 export function LanguageSwitch() {
   const { language, setLanguage, t } = useI18n();
-  const select = (next: Language) => { if (next !== language) setLanguage(next); };
-  return <div className="language-switch" role="group" aria-label={t("language")}><button type="button" className="language-switch-label" aria-pressed={language === "en"} onClick={() => select("en")}>english</button><button type="button" className={`language-toggle${language === "my" ? " is-my" : ""}`} aria-label={t("language")} onClick={() => select(language === "en" ? "my" : "en")}><LanguageFlag language="en" /><span className="language-knob-slot"><span className="language-knob" /></span><LanguageFlag language="my" /></button><button type="button" className="language-switch-label" aria-pressed={language === "my"} onClick={() => select("my")}>myanmar</button></div>;
+  return <SegmentedControl className="language-switch" aria-label={t("language")} value={language} onChange={(value) => setLanguage(value === "my" ? "my" : "en")} data={[{ label: <span className="language-label language-label-en">English</span>, value: "en" }, { label: <span className="language-label language-label-my">မြန်မာ</span>, value: "my" }]} />;
 }
 
 export function PageContainer({ children, className = "" }: { children: React.ReactNode; className?: string }) {

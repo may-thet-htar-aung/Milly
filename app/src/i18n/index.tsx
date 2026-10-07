@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import en, { type MessageKey } from "./en";
 import my from "./my";
+import type { ListingStatus } from "../types";
 
 export type { MessageKey };
 export type Language = "en" | "my";
@@ -48,7 +49,32 @@ export function useI18n() {
   return value;
 }
 
+const categoryMessageKeyBySlug: Record<string, MessageKey> = {
+  electronics: "categoryElectronics",
+  "home-furniture": "categoryHomeFurniture",
+  fashion: "categoryFashion",
+  "vehicles-parts": "categoryVehiclesParts",
+  "baby-kids": "categoryBabyKids",
+  "books-media": "categoryBooksMedia",
+  "sports-outdoors": "categorySportsOutdoors",
+  "beauty-personal-care": "categoryBeautyPersonalCare",
+  other: "categoryOther",
+  "phones-tablets": "categoryPhonesTablets",
+  computers: "categoryComputers",
+  "shoes-accessories": "categoryShoesAccessories",
+};
+
+export function categoryLabel(t: I18nContextValue["t"], category: { slug: string; name: string }) {
+  const key = categoryMessageKeyBySlug[category.slug];
+  return key ? t(key) : category.name;
+}
+
 export function conditionLabel(t: I18nContextValue["t"], condition: string) {
   const key = ({ NEW: "conditionNew", LIKE_NEW: "conditionLikeNew", GOOD: "conditionGood", FAIR: "conditionFair", POOR: "conditionPoor" } as const)[condition];
   return key ? t(key) : condition;
+}
+
+export function listingStatusLabel(t: I18nContextValue["t"], status: ListingStatus) {
+  const key = ({ ACTIVE: "published", DRAFT: "draft", RESERVED: "pendingReview", SOLD: "sold", ARCHIVED: "archived" } as const)[status];
+  return key ? t(key) : status;
 }
