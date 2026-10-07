@@ -45,19 +45,21 @@ p { line-height: 1.65; }
   letter-spacing: normal;
   text-transform: none;
 }
+:lang(my) h1 { font-size: clamp(1.6rem, 3vw, 3rem); }
+:lang(my) h2 { font-size: clamp(1.3rem, 2.2vw, 1.9rem); }
+:lang(my) h3 { font-size: clamp(1rem, 1.4vw, 1.2rem); }
 :lang(my) .listing-title { min-height: calc(1.7em * 2); line-height: normal; }
+:lang(my) .account-page .listing-title { font-size: .86rem; line-height: normal; }
 :lang(my) .badge, :lang(my) .image-condition { line-height: normal; text-transform: none; }
 
-.language-switch { display: inline-flex; align-items: center; gap: 8px; }
-.language-switch-label, .language-toggle { border: 0; padding: 0; background: transparent; font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: 1; letter-spacing: 0; }
-.language-switch-label { color: #9aa1ab; font-size: 13px; font-weight: 500; }
-.language-switch-label[aria-pressed="true"] { color: #5c6370; }
-.language-toggle { display: inline-flex; align-items: center; gap: 3px; height: 20px; padding: 0; border: 0; background: transparent; }
-.language-switch .language-flag { width: 16px; height: 16px; box-shadow: 0 0 0 1px rgba(32, 36, 44, .08); }
-.language-knob-slot { position: relative; width: 22px; height: 16px; }
-.language-knob { position: absolute; top: 0; left: 0; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(32, 36, 44, .22), 0 1px 4px rgba(32, 36, 44, .12); transition: left .18s ease; }
-.language-toggle.is-my .language-knob { left: 6px; }
-.language-flag { width: 22px; height: 22px; flex: 0 0 auto; border-radius: 50%; }
+.language-switch { width: max-content; min-width: 156px; }
+.language-switch .mantine-SegmentedControl-control { flex: 1; }
+.language-switch .mantine-SegmentedControl-label { height: 34.6667px; min-height: 34.6667px; padding-inline: 12px; color: #697180; font-size: 13px; font-weight: 600; }
+.language-switch .mantine-SegmentedControl-label[data-active] { color: #20242c; }
+.language-switch .language-label { display: inline-flex; align-items: center; justify-content: center; line-height: 1.25; }
+.language-switch .language-label-en { font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif; }
+.language-switch .language-label-my { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: normal; }
+:lang(my) .language-switch .mantine-SegmentedControl-label { line-height: normal; }
 
 .container { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
 .page-container { padding-top: 46px; padding-bottom: 96px; }
@@ -308,6 +310,7 @@ p { line-height: 1.65; }
 .admin-target-name { display: flex; align-items: center; gap: 10px; }
 .admin-side .admin-target-name,
 .admin-side .admin-target-name strong { color: var(--ink); font-size: 1rem; font-weight: 700; line-height: 1.65; }
+.admin-report-empty { margin: 0; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 8px; color: #374151; background: #f3f4f6; }
 .success-toast { position: fixed; right: 24px; bottom: 24px; z-index: 50; display: flex; align-items: center; gap: 10px; max-width: min(320px, calc(100% - 48px)); padding: 14px 18px; border: 0; border-radius: 12px; color: white; background: #1f7a4d; box-shadow: 0 14px 40px rgb(32 27 48 / 16%); font-size: .92rem; font-weight: 700; animation: success-toast-in .45s ease; }
 @keyframes success-toast-in { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .admin-status-options { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; }
@@ -344,7 +347,7 @@ p { line-height: 1.65; }
 .account-back:hover:not(:disabled) { border-color: transparent; }
 .page-heading { align-items: end; margin-bottom: 34px; }
 .page-heading h1 { max-width: 700px; font-size: clamp(2.4rem, 4.5vw, 4rem); }
-:lang(my) .page-heading h1 { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: normal; letter-spacing: normal; }
+:lang(my) .page-heading h1 { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; font-size: clamp(1.5rem, 3vw, 2.7rem); line-height: normal; letter-spacing: normal; }
 :lang(my) .admin-dash-title { font-size: clamp(1.75rem, 3vw, 2.4rem); }
 .page-heading p { max-width: 630px; margin-top: 12px; color: var(--muted); }
 .results-count { color: var(--muted); font-family: "DM Mono", monospace; font-size: .75rem; }
@@ -370,8 +373,12 @@ p { line-height: 1.65; }
 .input:focus, .textarea:focus { border-color: #a79ae9; box-shadow: 0 0 0 3px rgba(110,85,216,.12); }
 .input::placeholder, .textarea::placeholder { color: #a6acb6; }
 .select { appearance: none; padding-right: 40px; background-color: white; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236e55d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; }
+.select option:hover, .select option:focus, .select option:checked { color: var(--purple-dark); background: var(--purple-soft); }
 .sort-menu { position: relative; }
 .sort-menu-trigger { min-width: 180px; text-align: left; cursor: pointer; }
+.form-select-menu { width: 100%; }
+.form-select-menu .sort-menu-trigger { width: 100%; min-width: 0; }
+.form-select-menu .sort-menu-list { max-height: 260px; overflow-y: auto; }
 .sort-menu-list { position: absolute; z-index: 12; top: calc(100% + 6px); right: 0; left: 0; margin: 0; padding: 6px; list-style: none; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: var(--shadow); }
 .sort-menu-option { width: 100%; padding: 9px 10px; border: 0; border-radius: 7px; color: var(--ink); background: transparent; font-size: .88rem; font-weight: 500; text-align: left; }
 .sort-menu-option:hover, .sort-menu-option[aria-selected="true"] { color: var(--purple-dark); background: var(--purple-soft); }
@@ -471,9 +478,10 @@ p { line-height: 1.65; }
 .auth-points { display: grid; gap: 10px; margin-top: 30px; color: var(--purple-dark); font-size: .82rem; }
 .auth-points span { display: flex; align-items: center; gap: 7px; }
 .auth-points svg { padding: 2px; border-radius: 50%; color: var(--green); background: var(--green-soft); }
-.auth-card { padding: 30px; }
+.auth-card { width: 100%; min-width: 0; padding: 30px; }
 .auth-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .auth-card h2 { margin-top: 8px; }
+:lang(my) .auth-card h2 { font-size: 1.35rem; line-height: normal; }
 .auth-card > p { margin-top: 9px; color: var(--muted); font-size: .85rem; }
 .auth-form { display: grid; gap: 17px; margin-top: 27px; }
 .auth-switch { color: var(--muted); font-size: .8rem; text-align: center; }
@@ -499,7 +507,8 @@ p { line-height: 1.65; }
 
 .sell-page { padding-top: 28px; }
 .form-heading { max-width: 700px; margin: 38px 0 34px; }
-.form-heading h1 { margin-top: 9px; font-size: clamp(2.5rem, 5vw, 4.6rem); }
+.form-heading h1 { margin-top: 9px; font-size: clamp(2rem, 4vw, 3.6rem); }
+:lang(my) .form-heading h1 { font-size: clamp(1.15rem, 2vw, 1.75rem); line-height: normal; letter-spacing: normal; }
 .form-heading p { margin-top: 13px; color: var(--muted); }
 .sell-layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; align-items: start; gap: 24px; }
 .sell-form-card { padding: 27px; }
@@ -589,6 +598,8 @@ p { line-height: 1.65; }
 :lang(my) .hero-copy h1 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: normal; letter-spacing: normal; }
 :lang(my) .badge, :lang(my) .image-condition, :lang(my) .seller-status, :lang(my) .admin-account-section h2 { line-height: normal; letter-spacing: normal; text-transform: none; }
 :lang(my) .badge { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; padding-top: 6px; padding-bottom: 6px; }
+:lang(my) .admin-account-section span, :lang(my) .admin-account-section strong { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: normal; letter-spacing: normal; text-transform: none; }
+:lang(my) .admin-account-section p { gap: 6px; }
 :lang(my) .admin-metrics strong { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: normal; letter-spacing: normal; }
 :lang(my) .listing-title { min-height: 4.4em; line-height: normal; }
 :lang(my) .detail-facts, :lang(my) .safety-note, :lang(my) .form-hint, :lang(my) .sell-side-tip, :lang(my) .attachment-picker small, :lang(my) .attachment-note, :lang(my) .textarea, :lang(my) .account-grid p { line-height: normal; }
@@ -607,6 +618,8 @@ p { line-height: 1.65; }
 @media (max-width: 760px) {
   .container { width: min(100% - 30px, 620px); }
   .header-inner { min-height: 65px; }
+  .header-actions .language-switch { min-width: 136px; }
+  .header-actions .language-switch .mantine-SegmentedControl-label { padding-inline: 8px; }
   .header-actions .button { display: none; }
   .mobile-menu { display: grid; }
   .main-nav { position: absolute; top: 65px; right: 15px; left: 15px; display: none; flex-direction: column; align-items: stretch; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: var(--shadow); }
