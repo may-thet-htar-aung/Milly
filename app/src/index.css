@@ -603,6 +603,8 @@ p { line-height: 1.65; }
 :lang(my) .admin-metrics strong { font-family: "Noto Sans Myanmar", "DM Sans", ui-sans-serif, system-ui, sans-serif; line-height: normal; letter-spacing: normal; }
 :lang(my) .listing-title { min-height: 4.4em; line-height: normal; }
 :lang(my) .detail-facts, :lang(my) .safety-note, :lang(my) .form-hint, :lang(my) .sell-side-tip, :lang(my) .attachment-picker small, :lang(my) .attachment-note, :lang(my) .textarea, :lang(my) .account-grid p { line-height: normal; }
+:lang(my) .form-hint { align-items: flex-start; gap: 6px; }
+:lang(my) .form-hint svg { margin-top: .2em; }
 :lang(my) .account-grid p { min-height: 4.8em; }
 :lang(my) .account-hero h1, :lang(my) .profile-heading h1, :lang(my) .admin-account-title h1 { line-height: normal; letter-spacing: normal; }
 :lang(my) .admin-data-table th, :lang(my) .admin-data-table td { line-height: normal; letter-spacing: normal; text-transform: none; }
