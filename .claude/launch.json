@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "milly-api",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-NoProfile", "-Command", "Set-Location api; node node_modules/tsx/dist/cli.mjs src/server.ts"],
+      "port": 4000
+    },
+    {
+      "name": "milly-app",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-NoProfile", "-Command", "Set-Location app; node node_modules/vite/bin/vite.js --host 127.0.0.1"],
+      "port": 5173
+    }
+  ]
+}
